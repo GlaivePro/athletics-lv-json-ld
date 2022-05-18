@@ -133,3 +133,4 @@ Struktūra:
 ## Realizācijas paraugi
 
 - Procedurāla koda paraugs valodā PHP: https://github.com/GlaivePro/athletics-lv-json-ld/blob/master/examples/php-proc/export.php
+- Objektorientēta koda paraugs valodā PHP: https://github.com/GlaivePro/athletics-lv-json-ld/blob/master/examples/php-oop/export.php
