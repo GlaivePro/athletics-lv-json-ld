@@ -1,6 +1,24 @@
 <?php
 
-// Vienkārša, procedurāla koda paraugs
+// Procedurāla koda paraugs. Lai arī cenšamies dot korektus paraugus,
+// garantiju nav, jo šis ir piemērs nevis praksē pārbaudīts kods.
+
+// Funkcija, kas noformē laiku uz vajadzīgo hh:mm:ss.uuu
+function formatTime($time)
+{
+	$s = floor($time); // sekundes
+	$ms = round(1000 * ($time - $s)); // milisekundes
+	// `round` lietots, lai izlīdzinātu peldošo skaitļu aritmētikas problēmas
+	// labāk lietot speciālu paplašinājumu (piem bcmath) vai rīkus (DateInterval klasi, Carbon bibliotēku utt.)
+
+	$m = floor($s / 60); // minūtes
+	$s = $s - 60*$m;
+
+	$h = floor($s / 60); // stundas
+	$m = $m - 60*$h;
+
+	return sprintf('%02d:%02d:%02d.%03d', $h, $m, $s, $ms);
+}
 
 // Funkcija, kas noformē vienu rezultātu
 function prepareResult($result, $race)
@@ -27,7 +45,7 @@ function prepareResult($result, $race)
       '@id' => 'https://athletics.lv/race/'.$race->id.'.jsonld#'.$result->id.'-competitor',
 
       // Dalībnieka numurs
-      'bibIdentifier' => $result->participation->number,
+      'bibIdentifier' => $participation->number,
 
       // Persona vai komanda
       'agent' => [
@@ -64,7 +82,7 @@ function prepareResult($result, $race)
       '@id' => 'https://athletics.lv/race/'.$race->id.'.jsonld#'.$result->id.'-performance',
 
       // Laiks formātā hh:mm:ss.uuu
-      'time' => $result->performance,
+      'time' => formatTime($result->performance),
     ],
   ];
 }
@@ -77,7 +95,7 @@ function raceResults($race)
 
   // Noformējam rezultātus un pievienojam sarakstam
   foreach ($race->results as $result)
-    $results[] = $this->prepareResult($result, $race);
+    $results[] = prepareResult($result, $race);
 
   return [
     // Norāde uz izmantoto datu shēmu. Nav jāmaina.
@@ -102,12 +120,12 @@ $race = include '../race.php';
 $results = raceResults($race);
 
 // Iekodējam JSONā
-$results = json_encode($results);
+$data = json_encode($results);
 
 // Paziņojam klientam par datu tipu
 header('Content-Type: application:ld+json');
 
 // Nosūtām atbildi
-echo json_encode($this->raceResults($group));
+echo $data;
 
 exit;
